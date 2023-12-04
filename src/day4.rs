@@ -9,10 +9,7 @@ impl DaySolution for Day4 {
         input
             .lines()
             .map(|line| {
-                let numbers = line.split_once(": ").unwrap().1;
-                let (winning_numbers, my_numbers) = numbers.split_once(" | ").unwrap();
-                let winning_numbers = parse_numbers(winning_numbers);
-                let my_numbers = parse_numbers(my_numbers);
+                let (winning_numbers, my_numbers) = parse_line(line);
                 my_numbers.intersection(&winning_numbers).count()
             })
             .filter_map(|count| count.checked_sub(1))
@@ -26,11 +23,17 @@ impl DaySolution for Day4 {
     }
 }
 
-fn parse_numbers(numbers: &str) -> HashSet<usize> {
+fn parse_number_set(numbers: &str) -> HashSet<usize> {
     numbers
         .split_whitespace()
         .map(|n| n.parse().unwrap())
         .collect()
+}
+
+fn parse_line(line: &str) -> (HashSet<usize>, HashSet<usize>) {
+    let (_, numbers) = line.split_once(": ").unwrap();
+    let (winning, mine) = numbers.split_once(" | ").unwrap();
+    (parse_number_set(winning), parse_number_set(mine))
 }
 
 #[cfg(test)]

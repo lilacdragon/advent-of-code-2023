@@ -8,9 +8,9 @@ impl DaySolution for Day1 {
             .lines()
             .map(|l| {
                 let nums: Vec<_> = l.chars().filter(|c| c.is_digit(10)).collect();
-                let first = nums[0];
-                let last = nums.last().unwrap();
-                format!("{first}{last}").parse::<u32>().unwrap()
+                let first = nums[0].to_digit(10).unwrap();
+                let last = nums.last().unwrap().to_digit(10).unwrap();
+                first * 10 + last
             })
             .sum::<u32>()
             .to_string()
@@ -36,9 +36,7 @@ impl DaySolution for Day1 {
                         }
                     }
                 }
-                format!("{}{}", nums[0], nums.last().unwrap())
-                    .parse::<u32>()
-                    .unwrap()
+                nums[0] * 10 + nums.last().unwrap()
             })
             .sum::<u32>()
             .to_string()

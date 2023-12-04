@@ -1,10 +1,10 @@
 use std::ops::Add;
 
 use nom::{
-    bytes::complete::{tag, take_until, take_while},
-    character::complete::digit1,
-    combinator::opt,
-    multi::many1,
+    bytes::complete::{tag, take_while},
+    character::complete::{alpha1, digit1},
+    multi::{many1, separated_list1},
+    sequence::separated_pair,
     IResult,
 };
 
@@ -77,14 +77,7 @@ impl Add for RevealSet {
 }
 
 fn color_count(input: &str) -> IResult<&str, RevealSet> {
-    let (input, number) = digit1(input)?;
-    let (input, _) = tag(" ")(input)?;
-    let (input, color) = take_while(|c| c != ',')(input)?;
-    let input = if input.starts_with(", ") {
-        &input[2..]
-    } else {
-        input
-    };
+    let (input, (number, color)) = separated_pair(digit1, tag(" "), alpha1)(input)?;
     let mut set = RevealSet::default();
     match color {
         "blue" => set.blue = number.parse().unwrap(),
@@ -96,20 +89,14 @@ fn color_count(input: &str) -> IResult<&str, RevealSet> {
 }
 
 fn reveal_set(input: &str) -> IResult<&str, RevealSet> {
-    let (input, counts) = take_while(|c| c != ';')(input)?;
-    let input = if input.starts_with("; ") {
-        &input[2..]
-    } else {
-        input
-    };
-    let (_, counts) = many1(color_count)(counts)?;
+    let (input, counts) = separated_list1(tag(", "), color_count)(input)?;
     let set = counts.into_iter().reduce(RevealSet::add).unwrap();
     Ok((input, set))
 }
 
 fn game(input: &str) -> IResult<&str, (usize, Vec<RevealSet>)> {
     let (input, number) = game_number(input)?;
-    let (input, sets) = many1(reveal_set)(input)?;
+    let (input, sets) = separated_list1(tag("; "), reveal_set)(input)?;
     Ok((input, (number, sets)))
 }
 
@@ -157,9 +144,9 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"
     #[test]
     fn test_color_count() {
         assert_eq!(
-            super::color_count("3 blue, 4 red"),
+            super::color_count("3 blue"),
             Ok((
-                "4 red",
+                "",
                 RevealSet {
                     blue: 3,
                     red: 0,
@@ -168,24 +155,24 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"
             ))
         );
         assert_eq!(
-            super::color_count("1 red, 2 green, 6 blue"),
+            super::color_count("2 green, 6 blue"),
             Ok((
-                "2 green, 6 blue",
-                super::RevealSet {
-                    blue: 0,
-                    red: 1,
-                    green: 0
-                }
-            ))
-        );
-        assert_eq!(
-            super::color_count("2 green"),
-            Ok((
-                "",
+                ", 6 blue",
                 super::RevealSet {
                     blue: 0,
                     red: 0,
                     green: 2
+                }
+            ))
+        );
+        assert_eq!(
+            super::color_count("4 red, 13 green"),
+            Ok((
+                ", 13 green",
+                super::RevealSet {
+                    blue: 0,
+                    red: 4,
+                    green: 0
                 }
             ))
         );
@@ -196,11 +183,22 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"
         assert_eq!(
             super::reveal_set("3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"),
             Ok((
-                "1 red, 2 green, 6 blue; 2 green",
+                "; 1 red, 2 green, 6 blue; 2 green",
                 RevealSet {
                     blue: 3,
                     red: 4,
                     green: 0
+                }
+            ))
+        );
+        assert_eq!(
+            super::reveal_set("1 red, 2 green, 6 blue; 2 green"),
+            Ok((
+                "; 2 green",
+                RevealSet {
+                    blue: 6,
+                    red: 1,
+                    green: 2
                 }
             ))
         );

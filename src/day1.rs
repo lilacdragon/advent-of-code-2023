@@ -7,9 +7,19 @@ impl DaySolution for Day1 {
         input
             .lines()
             .map(|l| {
-                let nums: Vec<_> = l.chars().filter(|c| c.is_digit(10)).collect();
-                let first = nums[0].to_digit(10).unwrap();
-                let last = nums.last().unwrap().to_digit(10).unwrap();
+                let first = l
+                    .chars()
+                    .find(|c| c.is_digit(10))
+                    .unwrap()
+                    .to_digit(10)
+                    .unwrap();
+                let last = l
+                    .chars()
+                    .rev()
+                    .find(|c| c.is_digit(10))
+                    .unwrap()
+                    .to_digit(10)
+                    .unwrap();
                 first * 10 + last
             })
             .sum::<u32>()
@@ -23,20 +33,33 @@ impl DaySolution for Day1 {
             .lines()
             .map(|l| {
                 let chars: Vec<_> = l.chars().collect();
-                let mut nums = Vec::new();
-                for i in 0..chars.len() {
-                    if chars[i].is_digit(10) {
-                        nums.push(chars[i].to_digit(10).unwrap());
-                        continue;
-                    }
-                    for (j, w) in words.iter().enumerate() {
-                        if l[i..].starts_with(w) {
-                            nums.push((j + 1) as u32);
-                            break;
+                let first = 'l: {
+                    for i in 0.. {
+                        if chars[i].is_digit(10) {
+                            break 'l chars[i].to_digit(10).unwrap();
+                        }
+                        for (j, w) in words.iter().enumerate() {
+                            if l[i..].starts_with(w) {
+                                break 'l (j + 1) as u32;
+                            }
                         }
                     }
-                }
-                nums[0] * 10 + nums.last().unwrap()
+                    unreachable!()
+                };
+                let last = 'l: {
+                    for i in (0..chars.len()).rev() {
+                        if chars[i].is_digit(10) {
+                            break 'l chars[i].to_digit(10).unwrap();
+                        }
+                        for (j, w) in words.iter().enumerate() {
+                            if l[..=i].ends_with(w) {
+                                break 'l (j + 1) as u32;
+                            }
+                        }
+                    }
+                    unreachable!()
+                };
+                first * 10 + last
             })
             .sum::<u32>()
             .to_string()

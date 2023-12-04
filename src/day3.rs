@@ -2,6 +2,17 @@ use std::collections::{HashMap, HashSet};
 
 use crate::DaySolution;
 
+const AROUND: [(isize, isize); 8] = [
+    (-1, -1),
+    (-1, 0),
+    (-1, 1),
+    (0, -1),
+    (0, 1),
+    (1, -1),
+    (1, 0),
+    (1, 1),
+];
+
 pub struct Day3;
 
 impl DaySolution for Day3 {
@@ -17,44 +28,15 @@ impl DaySolution for Day3 {
                 match c {
                     '0'..='9' => {
                         current_number.push(c);
-                        // Top left
-                        if row > 0 && col > 0 && valid_symbol(grid[row - 1][col - 1]) {
-                            current_number_valid = true;
-                        }
-                        // Left
-                        if col > 0 && valid_symbol(grid[row][col - 1]) {
-                            current_number_valid = true;
-                        }
-                        // Bottom left
-                        if row < grid.len() - 1 && col > 0 && valid_symbol(grid[row + 1][col - 1]) {
-                            current_number_valid = true;
-                        }
-                        // Above
-                        if row > 0 && valid_symbol(grid[row - 1][col]) {
-                            current_number_valid = true;
-                        }
-                        // Below
-                        if row < grid.len() - 1 && valid_symbol(grid[row + 1][col]) {
-                            current_number_valid = true;
-                        }
-                        // Top right
-                        if row > 0
-                            && col < grid[row].len() - 1
-                            && valid_symbol(grid[row - 1][col + 1])
-                        {
-                            current_number_valid = true;
-                        }
-                        // Right
-                        if col < grid[row].len() - 1 && valid_symbol(grid[row][col + 1]) {
-                            current_number_valid = true;
-                        }
-                        // Bottom right
-                        if row < grid.len() - 1
-                            && col < grid[row].len() - 1
-                            && valid_symbol(grid[row + 1][col + 1])
-                        {
-                            current_number_valid = true;
-                        }
+                        current_number_valid = current_number_valid
+                            || AROUND.iter().any(|(row_offset, col_offset)| {
+                                let row = row as isize + row_offset;
+                                let col = col as isize + col_offset;
+                                grid.get(row as usize)
+                                    .and_then(|r| r.get(col as usize))
+                                    .map(|val| valid_symbol(*val))
+                                    .unwrap_or(false)
+                            });
                     }
                     _ => {
                         if current_number_valid {
@@ -85,40 +67,17 @@ impl DaySolution for Day3 {
                 match c {
                     '0'..='9' => {
                         current_number.push(c);
-                        // Top left
-                        if row > 0 && col > 0 && grid[row - 1][col - 1] == '*' {
-                            current_gears.insert((row - 1, col - 1));
-                        }
-                        // Left
-                        if col > 0 && grid[row][col - 1] == '*' {
-                            current_gears.insert((row, col - 1));
-                        }
-                        // Bottom left
-                        if row < grid.len() - 1 && col > 0 && grid[row + 1][col - 1] == '*' {
-                            current_gears.insert((row + 1, col - 1));
-                        }
-                        // Above
-                        if row > 0 && grid[row - 1][col] == '*' {
-                            current_gears.insert((row - 1, col));
-                        }
-                        // Below
-                        if row < grid.len() - 1 && grid[row + 1][col] == '*' {
-                            current_gears.insert((row + 1, col));
-                        }
-                        // Top right
-                        if row > 0 && col < grid[row].len() - 1 && grid[row - 1][col + 1] == '*' {
-                            current_gears.insert((row - 1, col + 1));
-                        }
-                        // Right
-                        if col < grid[row].len() - 1 && grid[row][col + 1] == '*' {
-                            current_gears.insert((row, col + 1));
-                        }
-                        // Bottom right
-                        if row < grid.len() - 1
-                            && col < grid[row].len() - 1
-                            && grid[row + 1][col + 1] == '*'
-                        {
-                            current_gears.insert((row + 1, col + 1));
+                        for (row_offset, col_offset) in AROUND.iter() {
+                            let row = row as isize + row_offset;
+                            let col = col as isize + col_offset;
+                            if grid
+                                .get(row as usize)
+                                .and_then(|r| r.get(col as usize))
+                                .map(|val| *val == '*')
+                                .unwrap_or(false)
+                            {
+                                current_gears.insert((row as usize, col as usize));
+                            }
                         }
                     }
                     _ => {

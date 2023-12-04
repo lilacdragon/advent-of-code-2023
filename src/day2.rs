@@ -1,9 +1,7 @@
-use std::ops::Add;
-
 use nom::{
-    bytes::complete::{tag, take_while},
+    bytes::complete::tag,
     character::complete::{alpha1, digit1},
-    multi::{many1, separated_list1},
+    multi::separated_list1,
     sequence::{separated_pair, tuple},
     IResult,
 };
@@ -60,16 +58,12 @@ impl RevealSet {
             green: self.green.max(other.green),
         }
     }
-}
 
-impl Add for RevealSet {
-    type Output = Self;
-
-    fn add(self, rhs: Self) -> Self::Output {
+    fn combine(self, other: Self) -> Self {
         Self {
-            blue: self.blue + rhs.blue,
-            red: self.red + rhs.red,
-            green: self.green + rhs.green,
+            blue: self.blue + other.blue,
+            red: self.red + other.red,
+            green: self.green + other.green,
         }
     }
 }
@@ -88,7 +82,7 @@ fn color_count(input: &str) -> IResult<&str, RevealSet> {
 
 fn reveal_set(input: &str) -> IResult<&str, RevealSet> {
     let (input, counts) = separated_list1(tag(", "), color_count)(input)?;
-    let set = counts.into_iter().reduce(RevealSet::add).unwrap();
+    let set = counts.into_iter().reduce(RevealSet::combine).unwrap();
     Ok((input, set))
 }
 

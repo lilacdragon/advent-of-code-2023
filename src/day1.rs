@@ -16,34 +16,32 @@ impl DaySolution for Day1 {
             .to_string()
     }
     fn part2(input: &str) -> String {
-        let replacements = [
-            ("one", "1"),
-            ("two", "2"),
-            ("three", "3"),
-            ("four", "4"),
-            ("five", "5"),
-            ("six", "6"),
-            ("seven", "7"),
-            ("eight", "8"),
-            ("nine", "9"),
+        let words = [
+            "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
         ];
-        let mut fixed = String::new();
-        for mut i in 0..input.len() - 1 {
-            let mut replaced = false;
-            for (find, replace) in &replacements {
-                if input[i..].starts_with(find) {
-                    fixed += replace;
-                    replaced = true;
-                    i += find.len();
-                    break;
-                } else {
+        input
+            .lines()
+            .map(|l| {
+                let chars: Vec<_> = l.chars().collect();
+                let mut nums = Vec::new();
+                for i in 0..chars.len() {
+                    if chars[i].is_digit(10) {
+                        nums.push(chars[i].to_digit(10).unwrap());
+                        continue;
+                    }
+                    for (j, w) in words.iter().enumerate() {
+                        if l[i..].starts_with(w) {
+                            nums.push((j + 1) as u32);
+                            break;
+                        }
+                    }
                 }
-            }
-            if !replaced {
-                fixed += &input.chars().nth(i).unwrap().to_string();
-            }
-        }
-        Self::part1(&fixed)
+                format!("{}{}", nums[0], nums.last().unwrap())
+                    .parse::<u32>()
+                    .unwrap()
+            })
+            .sum::<u32>()
+            .to_string()
     }
 }
 

@@ -4,7 +4,7 @@ use nom::{
     bytes::complete::{tag, take_while},
     character::complete::{alpha1, digit1},
     multi::{many1, separated_list1},
-    sequence::separated_pair,
+    sequence::{separated_pair, tuple},
     IResult,
 };
 
@@ -41,9 +41,7 @@ impl DaySolution for Day2 {
 }
 
 fn game_number(input: &str) -> IResult<&str, usize> {
-    let (input, _) = tag("Game ")(input)?;
-    let (input, number) = digit1(input)?;
-    let (input, _) = tag(": ")(input)?;
+    let (input, (_, number, _)) = tuple((tag("Game "), digit1, tag(": ")))(input)?;
     Ok((input, number.parse().unwrap()))
 }
 
@@ -95,8 +93,8 @@ fn reveal_set(input: &str) -> IResult<&str, RevealSet> {
 }
 
 fn game(input: &str) -> IResult<&str, (usize, Vec<RevealSet>)> {
-    let (input, number) = game_number(input)?;
-    let (input, sets) = separated_list1(tag("; "), reveal_set)(input)?;
+    let (input, (number, sets)) =
+        tuple((game_number, separated_list1(tag("; "), reveal_set)))(input)?;
     Ok((input, (number, sets)))
 }
 

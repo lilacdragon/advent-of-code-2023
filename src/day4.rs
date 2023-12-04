@@ -1,25 +1,24 @@
+use std::collections::HashSet;
+
 use crate::DaySolution;
 
 pub struct Day4;
 
 impl DaySolution for Day4 {
     fn part1(input: &str) -> String {
-        let mut total = 0;
-        for line in input.lines() {
-            let numbers = line.split_once(": ").unwrap().1;
-            let (winning_numbers, my_numbers) = numbers.split_once(" | ").unwrap();
-            let winning_numbers = parse_numbers(winning_numbers);
-            let my_numbers = parse_numbers(my_numbers);
-            let winning_count = my_numbers
-                .iter()
-                .filter(|n| winning_numbers.contains(n))
-                .count();
-
-            if winning_count > 0 {
-                total += 2i32.pow(winning_count as u32 - 1);
-            }
-        }
-        total.to_string()
+        input
+            .lines()
+            .map(|line| {
+                let numbers = line.split_once(": ").unwrap().1;
+                let (winning_numbers, my_numbers) = numbers.split_once(" | ").unwrap();
+                let winning_numbers = parse_numbers(winning_numbers);
+                let my_numbers = parse_numbers(my_numbers);
+                my_numbers.intersection(&winning_numbers).count()
+            })
+            .filter_map(|count| count.checked_sub(1))
+            .map(|count| 2u32.pow(count as u32))
+            .sum::<u32>()
+            .to_string()
     }
 
     fn part2(input: &str) -> String {
@@ -27,7 +26,7 @@ impl DaySolution for Day4 {
     }
 }
 
-fn parse_numbers(numbers: &str) -> Vec<usize> {
+fn parse_numbers(numbers: &str) -> HashSet<usize> {
     numbers
         .split_whitespace()
         .map(|n| n.parse().unwrap())

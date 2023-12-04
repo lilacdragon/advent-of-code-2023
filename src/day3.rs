@@ -100,16 +100,12 @@ impl DaySolution for Day3 {
             }
         }
 
-        let mut total_gear_ratios = 0;
-        for numbers in gears.values() {
-            if numbers.len() != 2 {
-                continue;
-            }
-            let ratio = numbers[0] * numbers[1];
-            total_gear_ratios += ratio;
-        }
-
-        total_gear_ratios.to_string()
+        gears
+            .values()
+            .filter(|numbers| numbers.len() == 2)
+            .map(|numbers| numbers[0] * numbers[1])
+            .sum::<usize>()
+            .to_string()
     }
 }
 

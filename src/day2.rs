@@ -1,11 +1,3 @@
-use nom::{
-    bytes::complete::tag,
-    character::complete::{alpha1, digit1},
-    multi::separated_list1,
-    sequence::{separated_pair, tuple},
-    IResult,
-};
-
 use crate::DaySolution;
 
 pub struct Day2;
@@ -14,11 +6,8 @@ impl DaySolution for Day2 {
     fn part1(input: &str) -> String {
         input
             .lines()
-            .map(|line| game(line).unwrap().1)
-            .filter(|(_, sets)| {
-                sets.iter()
-                    .all(|set| set.blue <= 14 && set.red <= 12 && set.green <= 13)
-            })
+            .map(|line| parse_line(line))
+            .filter(|(_, counts)| counts.blue <= 14 && counts.red <= 12 && counts.green <= 13)
             .map(|(n, _)| n)
             .sum::<usize>()
             .to_string()
@@ -26,75 +15,47 @@ impl DaySolution for Day2 {
     fn part2(input: &str) -> String {
         input
             .lines()
-            .map(|line| game(line).unwrap().1 .1)
-            .map(|sets| {
-                sets.into_iter()
-                    .reduce(|a, b| a.compute_minimums(&b))
-                    .unwrap()
-            })
-            .map(|set| set.blue * set.red * set.green)
+            .map(|line| parse_line(line).1)
+            .map(|counts| counts.blue * counts.red * counts.green)
             .sum::<usize>()
             .to_string()
     }
 }
 
-fn game_number(input: &str) -> IResult<&str, usize> {
-    let (input, (_, number, _)) = tuple((tag("Game "), digit1, tag(": ")))(input)?;
-    Ok((input, number.parse().unwrap()))
-}
-
 #[derive(Debug, Default, PartialEq, Eq)]
-struct RevealSet {
+struct ColorCounts {
     blue: usize,
     red: usize,
     green: usize,
 }
 
-impl RevealSet {
-    fn compute_minimums(&self, other: &Self) -> Self {
-        Self {
-            blue: self.blue.max(other.blue),
-            red: self.red.max(other.red),
-            green: self.green.max(other.green),
+fn parse_line_counts(counts: Vec<&str>) -> ColorCounts {
+    use std::cmp::max;
+
+    let mut color_counts = ColorCounts::default();
+    for count in counts {
+        let (number, color) = count.split_once(' ').unwrap();
+        match color {
+            "blue" => color_counts.blue = max(number.parse().unwrap(), color_counts.blue),
+            "red" => color_counts.red = max(number.parse().unwrap(), color_counts.red),
+            "green" => color_counts.green = max(number.parse().unwrap(), color_counts.green),
+            _ => unreachable!(),
         }
     }
-
-    fn combine(self, other: Self) -> Self {
-        Self {
-            blue: self.blue + other.blue,
-            red: self.red + other.red,
-            green: self.green + other.green,
-        }
-    }
+    color_counts
 }
 
-fn color_count(input: &str) -> IResult<&str, RevealSet> {
-    let (input, (number, color)) = separated_pair(digit1, tag(" "), alpha1)(input)?;
-    let mut set = RevealSet::default();
-    match color {
-        "blue" => set.blue = number.parse().unwrap(),
-        "red" => set.red = number.parse().unwrap(),
-        "green" => set.green = number.parse().unwrap(),
-        _ => unreachable!(),
-    }
-    Ok((input, set))
-}
+fn parse_line(line: &str) -> (usize, ColorCounts) {
+    let (number, sets) = line.split_once(": ").unwrap();
+    let number = number.split_once(' ').unwrap().1.parse().unwrap();
+    let sets = parse_line_counts(sets.split("; ").map(|s| s.split(", ")).flatten().collect());
 
-fn reveal_set(input: &str) -> IResult<&str, RevealSet> {
-    let (input, counts) = separated_list1(tag(", "), color_count)(input)?;
-    let set = counts.into_iter().reduce(RevealSet::combine).unwrap();
-    Ok((input, set))
-}
-
-fn game(input: &str) -> IResult<&str, (usize, Vec<RevealSet>)> {
-    let (input, (number, sets)) =
-        tuple((game_number, separated_list1(tag("; "), reveal_set)))(input)?;
-    Ok((input, (number, sets)))
+    (number, sets)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Day2, RevealSet};
+    use super::{ColorCounts, Day2};
     use crate::DaySolution;
 
     #[test]
@@ -126,103 +87,45 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"
     }
 
     #[test]
-    fn test_game_number() {
+    fn test_parse_line_counts() {
         assert_eq!(
-            super::game_number("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"),
-            Ok(("3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green", 1))
+            super::parse_line_counts(vec!["3 blue", "4 red"]),
+            ColorCounts {
+                blue: 3,
+                red: 4,
+                green: 0
+            }
+        );
+        assert_eq!(
+            super::parse_line_counts(vec!["1 red", "2 green", "6 blue"]),
+            ColorCounts {
+                blue: 6,
+                red: 1,
+                green: 2
+            }
+        );
+        assert_eq!(
+            super::parse_line_counts(vec!["2 green"]),
+            ColorCounts {
+                blue: 0,
+                red: 0,
+                green: 2
+            }
         );
     }
 
     #[test]
-    fn test_color_count() {
+    fn test_parse_line() {
         assert_eq!(
-            super::color_count("3 blue"),
-            Ok((
-                "",
-                RevealSet {
-                    blue: 3,
-                    red: 0,
-                    green: 0
-                }
-            ))
-        );
-        assert_eq!(
-            super::color_count("2 green, 6 blue"),
-            Ok((
-                ", 6 blue",
-                super::RevealSet {
-                    blue: 0,
-                    red: 0,
-                    green: 2
-                }
-            ))
-        );
-        assert_eq!(
-            super::color_count("4 red, 13 green"),
-            Ok((
-                ", 13 green",
-                super::RevealSet {
-                    blue: 0,
-                    red: 4,
-                    green: 0
-                }
-            ))
-        );
-    }
-
-    #[test]
-    fn test_reveal_set() {
-        assert_eq!(
-            super::reveal_set("3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"),
-            Ok((
-                "; 1 red, 2 green, 6 blue; 2 green",
-                RevealSet {
-                    blue: 3,
-                    red: 4,
-                    green: 0
-                }
-            ))
-        );
-        assert_eq!(
-            super::reveal_set("1 red, 2 green, 6 blue; 2 green"),
-            Ok((
-                "; 2 green",
-                RevealSet {
+            super::parse_line("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"),
+            (
+                1,
+                ColorCounts {
                     blue: 6,
-                    red: 1,
+                    red: 4,
                     green: 2
                 }
-            ))
-        );
-    }
-
-    #[test]
-    fn test_game() {
-        assert_eq!(
-            super::game("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"),
-            Ok((
-                "",
-                (
-                    1,
-                    vec![
-                        RevealSet {
-                            blue: 3,
-                            red: 4,
-                            green: 0
-                        },
-                        RevealSet {
-                            blue: 6,
-                            red: 1,
-                            green: 2
-                        },
-                        RevealSet {
-                            blue: 0,
-                            red: 0,
-                            green: 2
-                        }
-                    ]
-                )
-            ))
+            )
         );
     }
 }

@@ -103,9 +103,7 @@ fn reveal_set(input: &str) -> IResult<&str, RevealSet> {
         input
     };
     let (_, counts) = many1(color_count)(counts)?;
-    let set = counts
-        .into_iter()
-        .fold(RevealSet::default(), |acc, x| acc + x);
+    let set = counts.into_iter().reduce(RevealSet::add).unwrap();
     Ok((input, set))
 }
 

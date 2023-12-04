@@ -22,4 +22,5 @@ fn main() {
 
     let data = include_str!("../input/day3");
     println!("{}", Day3::part1(data));
+    println!("{}", Day3::part2(data));
 }

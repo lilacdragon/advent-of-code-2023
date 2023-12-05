@@ -1,6 +1,7 @@
 use std::ops::Range;
 
 use itertools::Itertools;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::DaySolution;
 
@@ -38,9 +39,11 @@ impl DaySolution for Day5 {
 
         let maps: Vec<_> = maps.split("\n\n").map(parse_map).collect();
 
-	let min_per_range = seeds.into_iter().map(|range| find_smallest_location(range.collect(), &maps));
+        let min_per_range = seeds
+            .into_iter()
+            .map(|range| find_smallest_location(range.collect(), &maps));
 
-	min_per_range.min().unwrap().to_string()
+        min_per_range.min().unwrap().to_string()
     }
 }
 
@@ -60,19 +63,17 @@ fn parse_map(map: &str) -> Vec<(Range<i64>, i64)> {
 }
 
 fn find_smallest_location(seeds: Vec<i64>, maps: &Vec<Vec<(Range<i64>, i64)>>) -> i64 {
-    maps.into_iter()
-        .fold(seeds, |cur, cur_map| {
-            cur.into_iter()
-                .map(|val| {
-                    cur_map
-                        .iter()
-                        .find(|(range, _)| range.contains(&val))
-                        .map(|(_, offset)| val + offset)
-                        .unwrap_or(val)
-                })
-                .collect()
+    seeds
+        .into_par_iter()
+        .map(|seed| {
+            maps.iter().fold(seed, |cur, cur_map| {
+                cur_map
+                    .iter()
+                    .find(|(range, _)| range.contains(&cur))
+                    .map(|(_, offset)| cur + offset)
+                    .unwrap_or(cur)
+            })
         })
-        .into_iter()
         .min()
         .unwrap()
 }

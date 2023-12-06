@@ -11,6 +11,7 @@ use day2::Day2;
 use day3::Day3;
 use day4::Day4;
 use day5::Day5;
+use day6::Day6;
 
 trait DaySolution {
     fn part1(input: &str) -> String;
@@ -34,7 +35,10 @@ fn main() {
     // println!("{}", Day4::part1(data));
     // println!("{}", Day4::part2(data));
 
-    let data = include_str!("../input/day5");
-    println!("{}", Day5::part1(data));
-    println!("{}", Day5::part2(data));
+    // let data = include_str!("../input/day5");
+    // println!("{}", Day5::part1(data));
+    // println!("{}", Day5::part2(data));
+
+    let data = include_str!("../input/day6");
+    println!("{}", Day6::part1(data));
 }

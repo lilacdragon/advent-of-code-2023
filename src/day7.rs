@@ -13,9 +13,9 @@ impl DaySolution for Day7 {
             .map(|l| {
                 let (hand, bid) = l.split_once(' ').unwrap();
                 let bid = bid.parse::<u64>().unwrap();
-                let hand_type = parse_hand_type(hand);
+                let hand_type = parse_hand_type(hand, false).0;
                 Hand {
-                    hand: parse_cards(hand),
+                    hand: parse_cards(hand, false),
                     hand_type,
                     bid,
                 }
@@ -27,12 +27,29 @@ impl DaySolution for Day7 {
             .to_string()
     }
     fn part2(input: &str) -> String {
-        "".to_string()
+        input
+            .lines()
+            .map(|l| {
+                let (hand, bid) = l.split_once(' ').unwrap();
+                let bid = bid.parse::<u64>().unwrap();
+                let (hand_type, jokers) = parse_hand_type(hand, true);
+                Hand {
+                    hand: parse_cards(hand, true),
+		    hand_type: joker_upgrade(hand_type, jokers),
+                    bid,
+                }
+            })
+            .sorted()
+            .enumerate()
+            .map(|(rank, hand)| (rank as u64 + 1) * hand.bid)
+            .sum::<u64>()
+            .to_string()
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum Card {
+    Joker,
     Two,
     Three,
     Four,
@@ -48,7 +65,7 @@ enum Card {
     Ace,
 }
 
-fn parse_cards(hand: &str) -> [Card; 5] {
+fn parse_cards(hand: &str, jokers: bool) -> [Card; 5] {
     let mut cards = [Card::Two; 5];
     for (i, c) in hand.chars().enumerate() {
         cards[i] = match c {
@@ -61,7 +78,13 @@ fn parse_cards(hand: &str) -> [Card; 5] {
             '8' => Card::Eight,
             '9' => Card::Nine,
             'T' => Card::Ten,
-            'J' => Card::Jack,
+            'J' => {
+                if jokers {
+                    Card::Joker
+                } else {
+                    Card::Jack
+                }
+            }
             'Q' => Card::Queen,
             'K' => Card::King,
             'A' => Card::Ace,
@@ -98,27 +121,51 @@ impl PartialOrd for Hand {
     }
 }
 
-fn parse_hand_type(hand: &str) -> HandType {
+fn parse_hand_type(hand: &str, jokers: bool) -> (HandType, u64) {
     let mut seen = HashMap::new();
     for c in hand.chars() {
         *seen.entry(c).or_insert(0) += 1;
     }
-    match seen
-        .into_values()
+    let joker_count = seen.get(&'J').copied().unwrap_or(0);
+    if jokers {
+	seen.remove(&'J');
+    }
+    let hand_type = match seen
+        .values()
+        .cloned()
         .sorted()
         .rev()
         .take(2)
         .next_tuple()
-        .unwrap_or((5, 0)) // Edge case, since five of a kind will only have one entry in map
+        .unwrap_or((*seen.values().max().unwrap_or(&5), 0))
     {
         (5, 0) => HandType::Five,
-        (4, 1) => HandType::Four,
+        (4, _) => HandType::Four,
         (3, 2) => HandType::FullHouse,
-        (3, 1) => HandType::Three,
+        (3, _) => HandType::Three,
         (2, 2) => HandType::TwoPair,
-        (2, 1) => HandType::Pair,
-        (1, 1) => HandType::High,
+        (2, _) => HandType::Pair,
+        (1, _) => HandType::High,
         _ => unreachable!(),
+    };
+
+    (hand_type, joker_count)
+}
+
+fn joker_upgrade(hand: HandType, jokers: u64) -> HandType {
+    match (hand, jokers) {
+        (HandType::High, 1) => HandType::Pair,
+	(HandType::High, 2) => HandType::Three,
+	(HandType::High, 3) => HandType::Four,
+	(HandType::High, 4) => HandType::Five,
+        (HandType::Pair, 1) => HandType::Three,
+	(HandType::Pair, 2) => HandType::Four,
+	(HandType::Pair, 3) => HandType::Five,
+        (HandType::TwoPair, 1) => HandType::FullHouse,
+        (HandType::Three, 1) => HandType::Four,
+        (HandType::Three, 2) => HandType::Five,
+        (HandType::Four, 1) => HandType::Five,
+        (hand, _) => hand,
     }
 }
 
@@ -150,7 +197,7 @@ KK677 28
 KTJJT 220
 QQQJA 483"
             ),
-            "".to_string()
+            "5905".to_string()
         );
     }
 }

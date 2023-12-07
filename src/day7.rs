@@ -15,7 +15,7 @@ impl DaySolution for Day7 {
                 let bid = bid.parse::<u64>().unwrap();
                 let hand_type = parse_hand_type(hand, false).0;
                 Hand {
-                    hand: parse_cards(hand, false),
+                    hand: parse_cards(hand),
                     hand_type,
                     bid,
                 }
@@ -34,8 +34,16 @@ impl DaySolution for Day7 {
                 let bid = bid.parse::<u64>().unwrap();
                 let (hand_type, jokers) = parse_hand_type(hand, true);
                 Hand {
-                    hand: parse_cards(hand, true),
-		    hand_type: joker_upgrade(hand_type, jokers),
+                    hand: parse_cards(hand)
+                        .into_iter()
+                        .map(|c| match c {
+                            Card::Jack => Card::Joker,
+                            c => c,
+                        })
+                        .collect_vec()
+                        .try_into()
+                        .unwrap(),
+                    hand_type: joker_upgrade(hand_type, jokers),
                     bid,
                 }
             })
@@ -65,7 +73,7 @@ enum Card {
     Ace,
 }
 
-fn parse_cards(hand: &str, jokers: bool) -> [Card; 5] {
+fn parse_cards(hand: &str) -> [Card; 5] {
     let mut cards = [Card::Two; 5];
     for (i, c) in hand.chars().enumerate() {
         cards[i] = match c {
@@ -78,13 +86,7 @@ fn parse_cards(hand: &str, jokers: bool) -> [Card; 5] {
             '8' => Card::Eight,
             '9' => Card::Nine,
             'T' => Card::Ten,
-            'J' => {
-                if jokers {
-                    Card::Joker
-                } else {
-                    Card::Jack
-                }
-            }
+            'J' => Card::Jack,
             'Q' => Card::Queen,
             'K' => Card::King,
             'A' => Card::Ace,
@@ -128,7 +130,7 @@ fn parse_hand_type(hand: &str, jokers: bool) -> (HandType, u64) {
     }
     let joker_count = seen.get(&'J').copied().unwrap_or(0);
     if jokers {
-	seen.remove(&'J');
+        seen.remove(&'J');
     }
     let hand_type = match seen
         .values()
@@ -137,7 +139,7 @@ fn parse_hand_type(hand: &str, jokers: bool) -> (HandType, u64) {
         .rev()
         .take(2)
         .next_tuple()
-        .unwrap_or((*seen.values().max().unwrap_or(&5), 0))
+        .unwrap_or((*seen.values().max().unwrap_or( & 5), 0))
     {
         (5, 0) => HandType::Five,
         (4, _) => HandType::Four,
@@ -155,12 +157,12 @@ fn parse_hand_type(hand: &str, jokers: bool) -> (HandType, u64) {
 fn joker_upgrade(hand: HandType, jokers: u64) -> HandType {
     match (hand, jokers) {
         (HandType::High, 1) => HandType::Pair,
-	(HandType::High, 2) => HandType::Three,
-	(HandType::High, 3) => HandType::Four,
-	(HandType::High, 4) => HandType::Five,
+        (HandType::High, 2) => HandType::Three,
+        (HandType::High, 3) => HandType::Four,
+        (HandType::High, 4) => HandType::Five,
         (HandType::Pair, 1) => HandType::Three,
-	(HandType::Pair, 2) => HandType::Four,
-	(HandType::Pair, 3) => HandType::Five,
+        (HandType::Pair, 2) => HandType::Four,
+        (HandType::Pair, 3) => HandType::Five,
         (HandType::TwoPair, 1) => HandType::FullHouse,
         (HandType::Three, 1) => HandType::Four,
         (HandType::Three, 2) => HandType::Five,

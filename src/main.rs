@@ -47,7 +47,11 @@ fn main() {
     // println!("{}", Day6::part1(data));
     // println!("{}", Day6::part2(data));
 
-    let data = include_str!("../input/day7");
-    println!("{}", Day7::part1(data));
-    println!("{}", Day7::part2(data));
+    // let data = include_str!("../input/day7");
+    // println!("{}", Day7::part1(data));
+    // println!("{}", Day7::part2(data));
+
+    let data = include_str!("../input/day8");
+    println!("{}", Day8::part1(data));
+    println!("{}", Day8::part2(data));
 }

@@ -44,7 +44,7 @@ impl DaySolution for Day7 {
                         .try_into()
                         .unwrap(),
                     hand_type: joker_upgrade(hand_type, jokers),
-                    bid,
+		    bid
                 }
             })
             .sorted()

@@ -4,6 +4,7 @@ use std::{
 };
 
 use itertools::Itertools;
+use num::integer::lcm;
 use regex::Regex;
 
 use crate::DaySolution;
@@ -15,7 +16,7 @@ impl DaySolution for Day8 {
         let (instructions, nodes) = input.split_once("\n\n").unwrap();
         let instructions = parse_instructions(instructions);
         let (nodes, index_map) = parse_nodes(nodes);
-	let (start_idx, end_idx) = (index_map["AAA"], index_map["ZZZ"]);
+        let (start_idx, end_idx) = (index_map["AAA"], index_map["ZZZ"]);
 
         let mut current_index = start_idx;
         for (steps, instruction) in instructions.into_iter().cycle().enumerate() {
@@ -29,7 +30,36 @@ impl DaySolution for Day8 {
     }
 
     fn part2(input: &str) -> String {
-        "".to_string()
+        let (instructions, nodes) = input.split_once("\n\n").unwrap();
+        let instructions = parse_instructions(instructions);
+        let (nodes, index_map) = parse_nodes(nodes);
+
+        let starting_idxs: Vec<usize> = index_map
+            .iter()
+            .filter(|(name, _)| name.ends_with("A"))
+            .map(|(_, idx)| *idx)
+            .collect();
+        let all_ending_idxs: HashSet<usize> = index_map
+            .iter()
+            .filter(|(name, _)| name.ends_with("Z"))
+            .map(|(_, idx)| *idx)
+            .collect();
+
+        let final_idxs: Vec<usize> = starting_idxs
+            .into_iter()
+            .map(|mut idx| {
+                for (steps, instruction) in instructions.iter().cycle().enumerate() {
+                    if all_ending_idxs.contains(&idx) {
+                        return steps;
+                    }
+
+                    idx = nodes[idx][*instruction];
+                }
+                unreachable!()
+            })
+            .collect();
+
+        final_idxs.into_iter().reduce(lcm).unwrap().to_string()
     }
 }
 

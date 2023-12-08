@@ -14,7 +14,8 @@ impl DaySolution for Day8 {
     fn part1(input: &str) -> String {
         let (instructions, nodes) = input.split_once("\n\n").unwrap();
         let instructions = parse_instructions(instructions);
-        let (nodes, start_idx, end_idx) = parse_nodes(nodes);
+        let (nodes, index_map) = parse_nodes(nodes);
+	let (start_idx, end_idx) = (index_map["AAA"], index_map["ZZZ"]);
 
         let mut current_index = start_idx;
         for (steps, instruction) in instructions.into_iter().cycle().enumerate() {
@@ -24,7 +25,7 @@ impl DaySolution for Day8 {
             current_index = nodes[current_index][instruction];
         }
 
-	unreachable!()
+        unreachable!()
     }
 
     fn part2(input: &str) -> String {
@@ -60,8 +61,8 @@ fn parse_instructions(input: &str) -> Vec<Instruction> {
         .collect()
 }
 
-fn parse_nodes(input: &str) -> (Vec<(usize, usize)>, usize, usize) {
-    let re = Regex::new(r"([A-Z]{3})").unwrap();
+fn parse_nodes(input: &str) -> (Vec<(usize, usize)>, HashMap<String, usize>) {
+    let re = Regex::new(r"([A-Z0-9]{3})").unwrap();
 
     let mut index_map = HashMap::new();
     let mut nodes = Vec::new();
@@ -74,7 +75,7 @@ fn parse_nodes(input: &str) -> (Vec<(usize, usize)>, usize, usize) {
         .map(|(l, r)| (index_map[l], index_map[r]))
         .collect();
 
-    (nodes, index_map["AAA"], index_map["ZZZ"])
+    (nodes, index_map)
 }
 
 #[cfg(test)]
@@ -111,6 +112,20 @@ ZZZ = (ZZZ, ZZZ)"
 
     #[test]
     fn test_part2() {
-        assert_eq!(Day8::part2(""), "");
+        assert_eq!(
+            Day8::part2(
+                "LR
+
+11A = (11B, XXX)
+11B = (XXX, 11Z)
+11Z = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)"
+            ),
+            "6"
+        );
     }
 }

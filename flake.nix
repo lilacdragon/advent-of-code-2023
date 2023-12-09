@@ -42,6 +42,14 @@
               package = rustfmt;
               category = "Rust";
             }
+            {
+              package = stdenv.cc;
+              category = "Build";
+            }
+            {
+              package = mold-wrapped;
+              category = "Build";
+            }
           ];
         };
       };

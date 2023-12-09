@@ -5,7 +5,7 @@ use crate::DaySolution;
 pub struct Day4;
 
 impl DaySolution for Day4 {
-    fn part1(input: &str) -> String {
+    fn star_one(input: &str) -> String {
         input
             .lines()
             .map(winning_numbers_count)
@@ -15,7 +15,7 @@ impl DaySolution for Day4 {
             .to_string()
     }
 
-    fn part2(input: &str) -> String {
+    fn star_two(input: &str) -> String {
         let lines: Vec<_> = input.lines().collect();
         let mut card_count = vec![1; lines.len()];
 
@@ -53,9 +53,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_part1() {
+    fn test_star_one() {
         assert_eq!(
-            Day4::part1(
+            Day4::star_one(
                 "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
 Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
 Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1
@@ -68,9 +68,9 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11"
     }
 
     #[test]
-    fn test_part2() {
+    fn test_star_two() {
         assert_eq!(
-            Day4::part2(
+            Day4::star_two(
                 "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
 Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
 Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1

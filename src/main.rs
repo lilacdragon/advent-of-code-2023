@@ -20,44 +20,44 @@ use day8::Day8;
 use day9::Day9;
 
 trait DaySolution {
-    fn part1(input: &str) -> String;
-    fn part2(input: &str) -> String;
+    fn star_one(input: &str) -> String;
+    fn star_two(input: &str) -> String;
 }
 
 fn main() {
     // let data = include_str!("../input/day1");
-    // println!("{}", Day1::part1(data));
-    // println!("{}", Day1::part2(data));
+    // println!("{}", Day1::star_one(data));
+    // println!("{}", Day1::star_two(data));
 
     // let data = include_str!("../input/day2");
-    // println!("{}", Day2::part1(data));
-    // println!("{}", Day2::part2(data));
+    // println!("{}", Day2::star_one(data));
+    // println!("{}", Day2::star_two(data));
 
     // let data = include_str!("../input/day3");
-    // println!("{}", Day3::part1(data));
-    // println!("{}", Day3::part2(data));
+    // println!("{}", Day3::star_one(data));
+    // println!("{}", Day3::star_two(data));
 
     // let data = include_str!("../input/day4");
-    // println!("{}", Day4::part1(data));
-    // println!("{}", Day4::part2(data));
+    // println!("{}", Day4::star_one(data));
+    // println!("{}", Day4::star_two(data));
 
     // let data = include_str!("../input/day5");
-    // println!("{}", Day5::part1(data));
-    // println!("{}", Day5::part2(data));
+    // println!("{}", Day5::star_one(data));
+    // println!("{}", Day5::star_two(data));
 
     // let data = include_str!("../input/day6");
-    // println!("{}", Day6::part1(data));
-    // println!("{}", Day6::part2(data));
+    // println!("{}", Day6::star_one(data));
+    // println!("{}", Day6::star_two(data));
 
     // let data = include_str!("../input/day7");
-    // println!("{}", Day7::part1(data));
-    // println!("{}", Day7::part2(data));
+    // println!("{}", Day7::star_one(data));
+    // println!("{}", Day7::star_two(data));
 
     // let data = include_str!("../input/day8");
-    // println!("{}", Day8::part1(data));
-    // println!("{}", Day8::part2(data));
+    // println!("{}", Day8::star_one(data));
+    // println!("{}", Day8::star_two(data));
 
     let data = include_str!("../input/day9");
-    println!("{}", Day9::part1(data));
-    println!("{}", Day9::part2(data));
+    println!("{}", Day9::star_one(data));
+    println!("{}", Day9::star_two(data));
 }

@@ -3,7 +3,7 @@ use crate::DaySolution;
 pub struct Day6;
 
 impl DaySolution for Day6 {
-    fn part1(input: &str) -> String {
+    fn star_one(input: &str) -> String {
         let (times, distances) = input.split_once("\n").unwrap();
         let times = times.split_whitespace().skip(1).map(|x| x.parse().unwrap());
         let distances = distances
@@ -23,7 +23,7 @@ impl DaySolution for Day6 {
             .to_string()
     }
 
-    fn part2(input: &str) -> String {
+    fn star_two(input: &str) -> String {
         let (time, distance) = input.split_once("\n").unwrap();
         let time = time
             .split_whitespace()
@@ -48,9 +48,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_part1() {
+    fn test_star_one() {
         assert_eq!(
-            Day6::part1(
+            Day6::star_one(
                 "Time:      7  15   30
 Distance:  9  40  200"
             ),
@@ -59,9 +59,9 @@ Distance:  9  40  200"
     }
 
     #[test]
-    fn test_part2() {
+    fn test_star_two() {
         assert_eq!(
-            Day6::part2(
+            Day6::star_two(
                 "Time:      7  15   30
 Distance:  9  40  200"
             ),

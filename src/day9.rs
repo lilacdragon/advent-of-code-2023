@@ -5,7 +5,7 @@ use std::ops::Index;
 pub struct Day9;
 
 impl DaySolution for Day9 {
-    fn part1(input: &str) -> String {
+    fn star_one(input: &str) -> String {
         input
             .lines()
             .map(|l| {
@@ -16,7 +16,7 @@ impl DaySolution for Day9 {
             .to_string()
     }
 
-    fn part2(input: &str) -> String {
+    fn star_two(input: &str) -> String {
         input
             .lines()
             .map(|l| {
@@ -91,9 +91,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_part1() {
+    fn test_star_one() {
         assert_eq!(
-            Day9::part1(
+            Day9::star_one(
                 "0 3 6 9 12 15
 1 3 6 10 15 21
 10 13 16 21 30 45"
@@ -103,9 +103,9 @@ mod tests {
     }
 
     #[test]
-    fn test_part2() {
+    fn test_star_two() {
         assert_eq!(
-            Day9::part2(
+            Day9::star_two(
                 "0 3 6 9 12 15
 1 3 6 10 15 21
 10 13 16 21 30 45"

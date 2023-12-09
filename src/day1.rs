@@ -3,7 +3,7 @@ use crate::DaySolution;
 pub struct Day1;
 
 impl DaySolution for Day1 {
-    fn part1(input: &str) -> String {
+    fn star_one(input: &str) -> String {
         input
             .lines()
             .map(|l| {
@@ -25,7 +25,7 @@ impl DaySolution for Day1 {
             .sum::<u32>()
             .to_string()
     }
-    fn part2(input: &str) -> String {
+    fn star_two(input: &str) -> String {
         let words = [
             "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
         ];
@@ -69,7 +69,7 @@ impl DaySolution for Day1 {
 #[test]
 fn part_1() {
     assert_eq!(
-        Day1::part1(
+        Day1::star_one(
             "1abc2
 pqr3stu8vwx
 a1b2c3d4e5f
@@ -81,7 +81,7 @@ treb7uchet"
 #[test]
 fn part_2() {
     assert_eq!(
-        Day1::part2(
+        Day1::star_two(
             "two1nine
 eightwothree
 abcone2threexyz

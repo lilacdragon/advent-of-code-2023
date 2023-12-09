@@ -16,7 +16,7 @@ const AROUND: [(isize, isize); 8] = [
 pub struct Day3;
 
 impl DaySolution for Day3 {
-    fn part1(input: &str) -> String {
+    fn star_one(input: &str) -> String {
         let grid: Vec<Vec<char>> = input.lines().map(|l| l.chars().collect()).collect();
 
         let mut numbers: Vec<usize> = Vec::new();
@@ -55,7 +55,7 @@ impl DaySolution for Day3 {
         numbers.iter().sum::<usize>().to_string()
     }
 
-    fn part2(input: &str) -> String {
+    fn star_two(input: &str) -> String {
         let grid: Vec<Vec<char>> = input.lines().map(|l| l.chars().collect()).collect();
 
         let mut gears = HashMap::new();
@@ -122,9 +122,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_part1() {
+    fn test_star_one() {
         assert_eq!(
-            Day3::part1(
+            Day3::star_one(
                 "467..114..
 ...*......
 ..35..633.
@@ -141,9 +141,9 @@ mod tests {
     }
 
     #[test]
-    fn test_part2() {
+    fn test_star_two() {
         assert_eq!(
-            Day3::part2(
+            Day3::star_two(
                 "467..114..
 ...*......
 ..35..633.

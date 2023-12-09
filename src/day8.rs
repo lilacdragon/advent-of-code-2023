@@ -12,7 +12,7 @@ use crate::DaySolution;
 pub struct Day8;
 
 impl DaySolution for Day8 {
-    fn part1(input: &str) -> String {
+    fn star_one(input: &str) -> String {
         let (instructions, nodes) = input.split_once("\n\n").unwrap();
         let instructions = parse_instructions(instructions);
         let (nodes, index_map) = parse_nodes(nodes);
@@ -29,7 +29,7 @@ impl DaySolution for Day8 {
         unreachable!()
     }
 
-    fn part2(input: &str) -> String {
+    fn star_two(input: &str) -> String {
         let (instructions, nodes) = input.split_once("\n\n").unwrap();
         let instructions = parse_instructions(instructions);
         let (nodes, index_map) = parse_nodes(nodes);
@@ -113,9 +113,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_part1() {
+    fn test_star_one() {
         assert_eq!(
-            Day8::part1(
+            Day8::star_one(
                 "RL
 
 AAA = (BBB, CCC)
@@ -129,7 +129,7 @@ ZZZ = (ZZZ, ZZZ)"
             "2"
         );
         assert_eq!(
-            Day8::part1(
+            Day8::star_one(
                 "LLR
 
 AAA = (BBB, BBB)
@@ -141,9 +141,9 @@ ZZZ = (ZZZ, ZZZ)"
     }
 
     #[test]
-    fn test_part2() {
+    fn test_star_two() {
         assert_eq!(
-            Day8::part2(
+            Day8::star_two(
                 "LR
 
 11A = (11B, XXX)

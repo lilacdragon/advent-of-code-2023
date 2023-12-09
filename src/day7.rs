@@ -7,7 +7,7 @@ use crate::DaySolution;
 pub struct Day7;
 
 impl DaySolution for Day7 {
-    fn part1(input: &str) -> String {
+    fn star_one(input: &str) -> String {
         input
             .lines()
             .map(|l| {
@@ -26,7 +26,7 @@ impl DaySolution for Day7 {
             .sum::<u64>()
             .to_string()
     }
-    fn part2(input: &str) -> String {
+    fn star_two(input: &str) -> String {
         input
             .lines()
             .map(|l| {
@@ -176,9 +176,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_part1() {
+    fn test_star_one() {
         assert_eq!(
-            Day7::part1(
+            Day7::star_one(
                 "32T3K 765
 T55J5 684
 KK677 28
@@ -190,9 +190,9 @@ QQQJA 483"
     }
 
     #[test]
-    fn test_part2() {
+    fn test_star_two() {
         assert_eq!(
-            Day7::part2(
+            Day7::star_two(
                 "32T3K 765
 T55J5 684
 KK677 28

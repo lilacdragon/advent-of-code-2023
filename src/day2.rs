@@ -3,7 +3,7 @@ use crate::DaySolution;
 pub struct Day2;
 
 impl DaySolution for Day2 {
-    fn part1(input: &str) -> String {
+    fn star_one(input: &str) -> String {
         input
             .lines()
             .map(|line| parse_line(line))
@@ -12,7 +12,7 @@ impl DaySolution for Day2 {
             .sum::<usize>()
             .to_string()
     }
-    fn part2(input: &str) -> String {
+    fn star_two(input: &str) -> String {
         input
             .lines()
             .map(|line| parse_line(line).1)
@@ -61,7 +61,7 @@ mod tests {
     #[test]
     fn part_1() {
         assert_eq!(
-            Day2::part1(
+            Day2::star_one(
                 "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
@@ -75,7 +75,7 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"
     #[test]
     fn part_2() {
         assert_eq!(
-            Day2::part2(
+            Day2::star_two(
                 "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red

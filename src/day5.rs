@@ -8,7 +8,7 @@ use crate::DaySolution;
 pub struct Day5;
 
 impl DaySolution for Day5 {
-    fn part1(input: &str) -> String {
+    fn star_one(input: &str) -> String {
         let (seeds, maps) = input.split_once("\n\n").unwrap();
 
         let seeds: Vec<i64> = seeds
@@ -24,7 +24,7 @@ impl DaySolution for Day5 {
         find_smallest_location(seeds, &maps).to_string()
     }
 
-    fn part2(input: &str) -> String {
+    fn star_two(input: &str) -> String {
         let (seeds, maps) = input.split_once("\n\n").unwrap();
 
         let seeds: Vec<Range<i64>> = seeds
@@ -83,9 +83,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_part1() {
+    fn test_star_one() {
         assert_eq!(
-            Day5::part1(
+            Day5::star_one(
                 "seeds: 79 14 55 13
 
 seed-to-soil map:
@@ -124,9 +124,9 @@ humidity-to-location map:
         );
     }
     #[test]
-    fn test_part2() {
+    fn test_star_two() {
         assert_eq!(
-            Day5::part2(
+            Day5::star_two(
                 "seeds: 79 14 55 13
 
 seed-to-soil map:

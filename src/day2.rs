@@ -59,7 +59,7 @@ mod tests {
     use crate::DaySolution;
 
     #[test]
-    fn part_1() {
+    fn test_star_one() {
         assert_eq!(
             Day2::star_one(
                 "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
@@ -73,7 +73,7 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"
     }
 
     #[test]
-    fn part_2() {
+    fn test_star_two() {
         assert_eq!(
             Day2::star_two(
                 "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green

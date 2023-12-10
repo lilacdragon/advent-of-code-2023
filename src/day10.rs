@@ -87,32 +87,16 @@ impl Direction {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Pipe {
-    Vertical,
-    Horizontal,
-    NorthEast,
-    NorthWest,
-    SouthWest,
-    SouthEast,
+    Directions(Direction, Direction),
     None,
     Start,
 }
 
 impl Pipe {
     fn connects_in_direction(&self, direction: Direction) -> bool {
-        match (self, direction) {
-            (Pipe::Vertical, Direction::North) => true,
-            (Pipe::Vertical, Direction::South) => true,
-            (Pipe::Horizontal, Direction::East) => true,
-            (Pipe::Horizontal, Direction::West) => true,
-            (Pipe::NorthEast, Direction::North) => true,
-            (Pipe::NorthEast, Direction::East) => true,
-            (Pipe::NorthWest, Direction::North) => true,
-            (Pipe::NorthWest, Direction::West) => true,
-            (Pipe::SouthWest, Direction::South) => true,
-            (Pipe::SouthWest, Direction::West) => true,
-            (Pipe::SouthEast, Direction::South) => true,
-            (Pipe::SouthEast, Direction::East) => true,
-            _ => false,
+        match self {
+            Pipe::Directions(d1, d2) => *d1 == direction || *d2 == direction,
+	    _ => false,
         }
     }
 }
@@ -120,12 +104,12 @@ impl Pipe {
 impl From<char> for Pipe {
     fn from(c: char) -> Self {
         match c {
-            '|' => Pipe::Vertical,
-            '-' => Pipe::Horizontal,
-            'L' => Pipe::NorthEast,
-            'J' => Pipe::NorthWest,
-            '7' => Pipe::SouthWest,
-            'F' => Pipe::SouthEast,
+            '|' => Pipe::Directions(Direction::North, Direction::South),
+            '-' => Pipe::Directions(Direction::East, Direction::West),
+            'L' => Pipe::Directions(Direction::North, Direction::East),
+            'J' => Pipe::Directions(Direction::North, Direction::West),
+            '7' => Pipe::Directions(Direction::South, Direction::West),
+            'F' => Pipe::Directions(Direction::South, Direction::East),
             '.' => Pipe::None,
             'S' => Pipe::Start,
             _ => unreachable!(),

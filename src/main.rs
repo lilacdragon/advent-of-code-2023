@@ -1,5 +1,6 @@
 #![allow(unused_imports)]
 mod day1;
+mod day10;
 mod day2;
 mod day3;
 mod day4;
@@ -8,9 +9,9 @@ mod day6;
 mod day7;
 mod day8;
 mod day9;
-mod day10;
 
 use day1::Day1;
+use day10::Day10;
 use day2::Day2;
 use day3::Day3;
 use day4::Day4;
@@ -42,9 +43,9 @@ fn main() {
     // println!("{}", Day4::star_one(data));
     // println!("{}", Day4::star_two(data));
 
-    let data = include_str!("../input/day5");
+    // let data = include_str!("../input/day5");
     // println!("{}", Day5::star_one(data));
-    println!("{}", Day5::star_two(data));
+    // println!("{}", Day5::star_two(data));
 
     // let data = include_str!("../input/day6");
     // println!("{}", Day6::star_one(data));
@@ -61,4 +62,8 @@ fn main() {
     // let data = include_str!("../input/day9");
     // println!("{}", Day9::star_one(data));
     // println!("{}", Day9::star_two(data));
+
+    let data = include_str!("../input/day10");
+    println!("{}", Day10::star_one(data));
+    println!("{}", Day10::star_two(data));
 }

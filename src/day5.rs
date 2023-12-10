@@ -40,8 +40,8 @@ impl DaySolution for Day5 {
         let maps: Vec<_> = maps.split("\n\n").map(parse_map).collect();
 
         let min_per_range = seeds
-            .into_iter()
-            .map(|range| find_smallest_location(range.collect(), &maps));
+            .into_par_iter()
+            .map(|range| find_smallest_location(range, &maps));
 
         min_per_range.min().unwrap().to_string()
     }
@@ -62,7 +62,7 @@ fn parse_map(map: &str) -> Vec<(Range<i64>, i64)> {
         .collect()
 }
 
-fn find_smallest_location(seeds: Vec<i64>, maps: &Vec<Vec<(Range<i64>, i64)>>) -> i64 {
+fn find_smallest_location<T: IntoParallelIterator<Item = i64>>(seeds: T, maps: &Vec<Vec<(Range<i64>, i64)>>) -> i64 {
     seeds
         .into_par_iter()
         .map(|seed| {

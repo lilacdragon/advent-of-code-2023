@@ -41,9 +41,9 @@ fn main() {
     // println!("{}", Day4::star_one(data));
     // println!("{}", Day4::star_two(data));
 
-    // let data = include_str!("../input/day5");
+    let data = include_str!("../input/day5");
     // println!("{}", Day5::star_one(data));
-    // println!("{}", Day5::star_two(data));
+    println!("{}", Day5::star_two(data));
 
     // let data = include_str!("../input/day6");
     // println!("{}", Day6::star_one(data));
@@ -57,7 +57,7 @@ fn main() {
     // println!("{}", Day8::star_one(data));
     // println!("{}", Day8::star_two(data));
 
-    let data = include_str!("../input/day9");
-    println!("{}", Day9::star_one(data));
-    println!("{}", Day9::star_two(data));
+    // let data = include_str!("../input/day9");
+    // println!("{}", Day9::star_one(data));
+    // println!("{}", Day9::star_two(data));
 }

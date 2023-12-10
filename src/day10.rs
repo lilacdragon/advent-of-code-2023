@@ -3,66 +3,50 @@ use std::ops::{Add, Index};
 
 pub struct Day10;
 
-const CROSS_OFFSETS: [(Direction, (isize, isize)); 4] = [
-    (Direction::North, (-1, 0)),
-    (Direction::South, (1, 0)),
-    (Direction::East, (0, 1)),
-    (Direction::West, (0, -1)),
+const DIRECTIONS: [Direction; 4] = [
+    Direction::North,
+    Direction::South,
+    Direction::East,
+    Direction::West,
 ];
 
 impl DaySolution for Day10 {
     fn star_one(input: &str) -> String {
         let tiles = Tiles::from(input);
 
-        let (mut current_position, mut last_direction) = CROSS_OFFSETS
+        let (mut current_position, mut last_direction) = DIRECTIONS
             .iter()
-            .find_map(|(direction, offset)| {
-                let next_position = tiles.start + *offset;
-                if let Some(pipe) = next_position.and_then(|p| tiles.get(p)) {
-                    if pipe.connects_in_direction(direction.opposite()) {
-                        Some((next_position.unwrap(), direction.opposite()))
-                    } else {
-                        None
+            .find_map(|direction| {
+                let next_position = tiles.start + direction.get_offset();
+                match tiles.get(next_position) {
+                    Some(pipe) if pipe.connects_in_direction(direction.opposite()) => {
+                        Some((next_position, direction.opposite()))
                     }
-                } else {
-                    None
+                    _ => None,
                 }
             })
             .unwrap();
-        let mut steps = 1;
 
+        let mut steps = 1;
         while tiles.get(current_position).unwrap() != Pipe::Start {
-            for d in [
-                Direction::North,
-                Direction::South,
-                Direction::East,
-                Direction::West,
-            ] {
-                if d == last_direction {
-                    continue;
-                }
-                let (next_position, next_direction) = CROSS_OFFSETS
-                    .iter()
-                    .find_map(|(direction, offset)| {
-                        if *direction == d {
-                            Some((current_position + *offset, *direction))
-                        } else {
-                            None
-                        }
-                    })
-                    .unwrap();
-                if let Some(_) = next_position.and_then(|p| tiles.get(p)) {
-                    if tiles
+            (current_position, last_direction) = DIRECTIONS
+                .into_iter()
+                .filter(|&d| d != last_direction)
+                .filter(|&d| {
+                    tiles
                         .get(current_position)
                         .unwrap()
-                        .connects_in_direction(next_direction)
-                    {
-                        current_position = next_position.unwrap();
-                        last_direction = next_direction.opposite();
-                        break;
+                        .connects_in_direction(d)
+                })
+                .find_map(|d| {
+                    let next_position = current_position + d.get_offset();
+                    if let Some(_) = tiles.get(next_position) {
+                        Some((next_position, d.opposite()))
+                    } else {
+                        None
                     }
-                }
-            }
+                })
+                .unwrap();
             steps += 1;
         }
 
@@ -83,6 +67,14 @@ enum Direction {
 }
 
 impl Direction {
+    fn get_offset(&self) -> (isize, isize) {
+        match self {
+            Direction::North => (-1, 0),
+            Direction::South => (1, 0),
+            Direction::East => (0, 1),
+            Direction::West => (0, -1),
+        }
+    }
     fn opposite(&self) -> Self {
         match self {
             Direction::North => Direction::South,
@@ -145,15 +137,10 @@ impl From<char> for Pipe {
 struct Position(isize, isize);
 
 impl Add<(isize, isize)> for Position {
-    type Output = Option<Self>;
+    type Output = Self;
 
     fn add(self, (x, y): (isize, isize)) -> Self::Output {
-        let (x, y) = (self.0 + x, self.1 + y);
-        if x < 0 || y < 0 {
-            None
-        } else {
-            Some(Position(x, y))
-        }
+        Position(self.0 + x, self.1 + y)
     }
 }
 
@@ -189,8 +176,8 @@ impl From<&str> for Tiles {
 impl Tiles {
     fn get(&self, index: Position) -> Option<Pipe> {
         self.tiles
-            .get(index.0 as usize)
-            .and_then(|row| row.get(index.1 as usize))
+            .get(usize::try_from(index.0).ok()?)
+            .and_then(|row| row.get(usize::try_from(index.1).ok()?))
             .copied()
     }
 }

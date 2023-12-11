@@ -14,7 +14,9 @@ impl DaySolution for Day11 {
     }
 
     fn star_two(input: &str) -> String {
-        "".to_string()
+        let mut image = Image::from(input);
+        image.calc_expansion(1_000_000);
+        image.solve_shortest_distances().to_string()
     }
 }
 
@@ -26,9 +28,9 @@ enum Pixel {
 
 struct Image {
     pixels: Vec<Vec<Pixel>>,
-    empty_rows: HashSet<isize>,
-    empty_columns: HashSet<isize>,
-    expansion_factor: isize,
+    empty_rows: HashSet<usize>,
+    empty_columns: HashSet<usize>,
+    expansion_factor: usize,
 }
 
 impl From<&str> for Image {
@@ -54,19 +56,17 @@ impl From<&str> for Image {
 }
 
 impl Image {
-    fn calc_expansion(&mut self, factor: isize) {
+    fn calc_expansion(&mut self, factor: usize) {
         let image = &self.pixels;
 
         let empty_rows = (0..image.len())
             .filter(|row| image[*row].iter().all(|p| *p == Pixel::Empty))
             .rev()
-            .map(|x| x as isize)
             .collect();
 
         let empty_columns = (0..image[0].len())
             .filter(|column| image.iter().all(|row| row[*column] == Pixel::Empty))
             .rev()
-            .map(|x| x as isize)
             .collect();
 
         self.empty_rows = empty_rows;
@@ -74,7 +74,7 @@ impl Image {
         self.expansion_factor = factor;
     }
 
-    fn solve_shortest_distances(&self) -> isize {
+    fn solve_shortest_distances(&self) -> usize {
         let galaxy_positions = self
             .pixels
             .iter()
@@ -88,7 +88,7 @@ impl Image {
             .flatten()
             .filter(|(_, pixel)| **pixel == Pixel::Galaxy)
             .map(|(position, _)| position)
-            .map(|(row, column)| (row as isize, column as isize));
+            .map(|(row, column)| (row, column));
         galaxy_positions
             .combinations_with_replacement(2)
             .map(|elements| {
@@ -96,13 +96,16 @@ impl Image {
                 let b = elements[1];
                 let empty_rows = fixed_range(a.0, b.0)
                     .filter(|row| self.empty_rows.contains(row))
-                    .count() as isize;
-                let row_expansion = empty_rows as isize * self.expansion_factor;
+                    .count();
+                let row_expansion = empty_rows * self.expansion_factor;
                 let empty_columns = fixed_range(a.1, b.1)
                     .filter(|column| self.empty_columns.contains(column))
-                    .count() as isize;
+                    .count();
                 let column_expansion = empty_columns * self.expansion_factor;
-                (a.0 - b.0).abs() + (a.1 - b.1).abs() + row_expansion + column_expansion
+                (a.0 as isize - b.0 as isize).abs() as usize
+                    + (a.1 as isize - b.1 as isize).abs() as usize
+                    + row_expansion
+                    + column_expansion
                     - empty_rows
                     - empty_columns
             })
@@ -125,7 +128,7 @@ impl Debug for Image {
     }
 }
 
-fn fixed_range(a: isize, b: isize) -> Range<isize> {
+fn fixed_range(a: usize, b: usize) -> Range<usize> {
     if a < b {
         a..b
     } else {

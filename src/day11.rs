@@ -9,7 +9,7 @@ pub struct Day11;
 impl DaySolution for Day11 {
     fn star_one(input: &str) -> String {
         let mut image = Image::from(input);
-        image.calc_expansion(1);
+        image.calc_expansion(2);
         image.solve_shortest_distances().to_string()
     }
 
@@ -26,9 +26,9 @@ enum Pixel {
 
 struct Image {
     pixels: Vec<Vec<Pixel>>,
-    empty_rows: HashSet<usize>,
-    empty_columns: HashSet<usize>,
-    expansion_factor: usize,
+    empty_rows: HashSet<isize>,
+    empty_columns: HashSet<isize>,
+    expansion_factor: isize,
 }
 
 impl From<&str> for Image {
@@ -54,17 +54,19 @@ impl From<&str> for Image {
 }
 
 impl Image {
-    fn calc_expansion(&mut self, factor: usize) {
+    fn calc_expansion(&mut self, factor: isize) {
         let image = &self.pixels;
 
         let empty_rows = (0..image.len())
             .filter(|row| image[*row].iter().all(|p| *p == Pixel::Empty))
             .rev()
+            .map(|x| x as isize)
             .collect();
 
         let empty_columns = (0..image[0].len())
             .filter(|column| image.iter().all(|row| row[*column] == Pixel::Empty))
             .rev()
+            .map(|x| x as isize)
             .collect();
 
         self.empty_rows = empty_rows;
@@ -72,10 +74,10 @@ impl Image {
         self.expansion_factor = factor;
     }
 
-    fn solve_shortest_distances(self) -> isize {
+    fn solve_shortest_distances(&self) -> isize {
         let galaxy_positions = self
             .pixels
-            .into_iter()
+            .iter()
             .enumerate()
             .map(|(row, pixels)| {
                 pixels
@@ -84,26 +86,25 @@ impl Image {
                     .map(move |(column, pixel)| ((row, column), pixel))
             })
             .flatten()
-            .filter(|(_, pixel)| *pixel == Pixel::Galaxy)
-            .map(|(position, _)| position);
+            .filter(|(_, pixel)| **pixel == Pixel::Galaxy)
+            .map(|(position, _)| position)
+            .map(|(row, column)| (row as isize, column as isize));
         galaxy_positions
             .combinations_with_replacement(2)
             .map(|elements| {
                 let a = elements[0];
                 let b = elements[1];
-                let row_expansion = fixed_range(a.0, b.0)
+                let empty_rows = fixed_range(a.0, b.0)
                     .filter(|row| self.empty_rows.contains(row))
-                    .count()
-                    * self.expansion_factor;
-                let column_expansion = fixed_range(a.1, b.1)
+                    .count() as isize;
+                let row_expansion = empty_rows as isize * self.expansion_factor;
+                let empty_columns = fixed_range(a.1, b.1)
                     .filter(|column| self.empty_columns.contains(column))
-                    .count()
-                    * self.expansion_factor;
-                dbg!(a, b, row_expansion, column_expansion);
-                (a.0 as isize - b.0 as isize).abs()
-                    + (a.1 as isize - b.1 as isize).abs()
-                    + row_expansion as isize
-                    + column_expansion as isize
+                    .count() as isize;
+                let column_expansion = empty_columns * self.expansion_factor;
+                (a.0 - b.0).abs() + (a.1 - b.1).abs() + row_expansion + column_expansion
+                    - empty_rows
+                    - empty_columns
             })
             .sum()
     }
@@ -124,7 +125,7 @@ impl Debug for Image {
     }
 }
 
-fn fixed_range(a: usize, b: usize) -> Range<usize> {
+fn fixed_range(a: isize, b: isize) -> Range<isize> {
     if a < b {
         a..b
     } else {
@@ -157,4 +158,26 @@ mod tests {
 
     #[test]
     fn test_star_two() {}
+
+    #[test]
+    fn test_expansion() {
+        let mut image = Image::from(
+            "...#......
+.......#..
+#.........
+..........
+......#...
+.#........
+.........#
+..........
+.......#..
+#...#.....",
+        );
+        image.calc_expansion(2);
+        assert_eq!(image.solve_shortest_distances(), 374);
+        image.calc_expansion(10);
+        assert_eq!(image.solve_shortest_distances(), 1030);
+        image.calc_expansion(100);
+        assert_eq!(image.solve_shortest_distances(), 8410);
+    }
 }

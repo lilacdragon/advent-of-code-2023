@@ -22,12 +22,14 @@ enum Pixel {
     Galaxy,
 }
 
-struct Image(Vec<Vec<Pixel>>);
+struct Image {
+    pixels: Vec<Vec<Pixel>>,
+}
 
 impl From<&str> for Image {
     fn from(input: &str) -> Self {
-        Image(
-            input
+        Image {
+            pixels: input
                 .lines()
                 .map(|line| {
                     line.chars()
@@ -39,13 +41,13 @@ impl From<&str> for Image {
                         .collect()
                 })
                 .collect(),
-        )
+        }
     }
 }
 
 impl Image {
     fn expand(self) -> Self {
-        let mut image = self.0;
+        let mut image = self.pixels;
 
         let empty_rows: Vec<usize> = (0..image.len())
             .filter(|row| image[*row].iter().all(|p| *p == Pixel::Empty))
@@ -65,12 +67,12 @@ impl Image {
             }
         }
 
-        Image(image)
+        Image { pixels: image }
     }
 
     fn solve_shortest_distances(self) -> isize {
         let galaxy_positions = self
-            .0
+            .pixels
             .into_iter()
             .enumerate()
             .map(|(row, pixels)| {
@@ -95,7 +97,7 @@ impl Image {
 
 impl Debug for Image {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        for row in &self.0 {
+        for row in &self.pixels {
             for pixel in row {
                 match pixel {
                     Pixel::Empty => write!(f, ".")?,

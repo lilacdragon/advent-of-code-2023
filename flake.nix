@@ -35,6 +35,10 @@
               category = "Rust";
             }
             {
+              package = rustc;
+              category = "Rust";
+            }
+            {
               package = rust-analyzer;
               category = "Rust";
             }

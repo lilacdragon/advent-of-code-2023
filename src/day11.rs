@@ -1,13 +1,15 @@
 use crate::DaySolution;
 use itertools::Itertools;
+use std::collections::HashSet;
 use std::fmt::{Debug, Formatter};
+use std::ops::Range;
 
 pub struct Day11;
 
 impl DaySolution for Day11 {
     fn star_one(input: &str) -> String {
         let mut image = Image::from(input);
-        image = image.expand();
+        image.calc_expansion(1);
         image.solve_shortest_distances().to_string()
     }
 
@@ -24,6 +26,9 @@ enum Pixel {
 
 struct Image {
     pixels: Vec<Vec<Pixel>>,
+    empty_rows: HashSet<usize>,
+    empty_columns: HashSet<usize>,
+    expansion_factor: usize,
 }
 
 impl From<&str> for Image {
@@ -41,33 +46,30 @@ impl From<&str> for Image {
                         .collect()
                 })
                 .collect(),
+            empty_rows: HashSet::new(),
+            empty_columns: HashSet::new(),
+            expansion_factor: 0,
         }
     }
 }
 
 impl Image {
-    fn expand(self) -> Self {
-        let mut image = self.pixels;
+    fn calc_expansion(&mut self, factor: usize) {
+        let image = &self.pixels;
 
-        let empty_rows: Vec<usize> = (0..image.len())
+        let empty_rows = (0..image.len())
             .filter(|row| image[*row].iter().all(|p| *p == Pixel::Empty))
             .rev()
             .collect();
-        for row in empty_rows {
-            image.insert(row, vec![Pixel::Empty; image[row].len()]);
-        }
 
-        let empty_columns: Vec<usize> = (0..image[0].len())
+        let empty_columns = (0..image[0].len())
             .filter(|column| image.iter().all(|row| row[*column] == Pixel::Empty))
             .rev()
             .collect();
-        for row in &mut image {
-            for column in &empty_columns {
-                row.insert(*column, Pixel::Empty);
-            }
-        }
 
-        Image { pixels: image }
+        self.empty_rows = empty_rows;
+        self.empty_columns = empty_columns;
+        self.expansion_factor = factor;
     }
 
     fn solve_shortest_distances(self) -> isize {
@@ -89,7 +91,19 @@ impl Image {
             .map(|elements| {
                 let a = elements[0];
                 let b = elements[1];
-                (a.0 as isize - b.0 as isize).abs() + (a.1 as isize - b.1 as isize).abs()
+                let row_expansion = fixed_range(a.0, b.0)
+                    .filter(|row| self.empty_rows.contains(row))
+                    .count()
+                    * self.expansion_factor;
+                let column_expansion = fixed_range(a.1, b.1)
+                    .filter(|column| self.empty_columns.contains(column))
+                    .count()
+                    * self.expansion_factor;
+                dbg!(a, b, row_expansion, column_expansion);
+                (a.0 as isize - b.0 as isize).abs()
+                    + (a.1 as isize - b.1 as isize).abs()
+                    + row_expansion as isize
+                    + column_expansion as isize
             })
             .sum()
     }
@@ -107,6 +121,14 @@ impl Debug for Image {
             writeln!(f)?;
         }
         Ok(())
+    }
+}
+
+fn fixed_range(a: usize, b: usize) -> Range<usize> {
+    if a < b {
+        a..b
+    } else {
+        b..a
     }
 }
 
@@ -134,38 +156,5 @@ mod tests {
     }
 
     #[test]
-    fn test_star_two() {
-        assert_eq!(Day11::star_two(""), "".to_string());
-    }
-
-    #[test]
-    fn test_image_expansion() {
-        let image = Image::from(
-            "...#......
-.......#..
-#.........
-..........
-......#...
-.#........
-.........#
-..........
-.......#..
-#...#.....",
-        );
-        assert_eq!(
-            format!("{:?}", image.expand()).trim(),
-            "....#........
-.........#...
-#............
-.............
-.............
-........#....
-.#...........
-............#
-.............
-.............
-.........#...
-#....#......."
-        );
-    }
+    fn test_star_two() {}
 }

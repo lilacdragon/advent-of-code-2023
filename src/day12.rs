@@ -1,3 +1,5 @@
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
+
 use crate::DaySolution;
 
 pub struct Day12;
@@ -7,7 +9,7 @@ impl DaySolution for Day12 {
         let tiles: Vec<Row> = input.lines().map(Row::from).collect();
 
         tiles
-            .into_iter()
+            .into_par_iter()
             .map(|row| row.possible_arrangements())
             .sum::<usize>()
             .to_string()
